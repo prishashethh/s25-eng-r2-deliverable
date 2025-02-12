@@ -16,7 +16,13 @@ import Image from "next/image";
 import DeleteSpeciesButton from "./delete-species-button";
 import EditSpeciesDialog from "./edit-species-dialog";
 import SpeciesDetailsDialog from "./species-details-dialog"; // Import the dialog
-type Species = Database["public"]["Tables"]["species"]["Row"];
+type Species = Database["public"]["Tables"]["species"]["Row"] & {
+  profiles?: {
+    id: string;
+    display_name: string | null;
+    email: string;
+  } | null;
+};
 
 export default function SpeciesCard({ species, sessionId }: { species: Species; sessionId: string }) {
   return (
@@ -30,7 +36,7 @@ export default function SpeciesCard({ species, sessionId }: { species: Species; 
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
       {/* Replace the button with the detailed view dialog. */}
-      <SpeciesDetailsDialog species={species} />
+      <SpeciesDetailsDialog species={{ ...species, profiles: species.profiles ?? null }} />
 
       {/* Show Edit button only if the user is the author */}
       {species.author === sessionId && (
