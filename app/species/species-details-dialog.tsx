@@ -6,7 +6,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import type { Database } from "@/lib/schema";
 
 /* This defines the Species type from our database */
-type Species = Database["public"]["Tables"]["species"]["Row"];
+type Species = Database["public"]["Tables"]["species"]["Row"] & {
+  profiles: {
+    id: string;
+    display_name: string | null;
+    email: string;
+  } | null; // ✅ Allow null in case no author data exists
+};
 
 export default function SpeciesDetailsDialog({ species }: { species: Species }) {
   return (
@@ -28,8 +34,19 @@ export default function SpeciesDetailsDialog({ species }: { species: Species }) 
           <p>
             <strong>Kingdom:</strong> {species.kingdom}
           </p>
+          <p className={`font-bold ${species.endangered ? "text-red-600" : "text-green-600"}`}>
+            <strong>Status:</strong> {species.endangered ? "Endangered" : "Not Endangered"}
+          </p>
           <p>
             <strong>Description:</strong> {species.description ?? "No description available."}
+          </p>
+
+          <hr className="my-3" />
+          <p>
+            <strong>Added By:</strong> {species.profiles?.display_name ?? "Unknown"}
+          </p>
+          <p>
+            <strong>Contact:</strong> {species.profiles?.email ?? "No contact available"}
           </p>
         </div>
       </DialogContent>

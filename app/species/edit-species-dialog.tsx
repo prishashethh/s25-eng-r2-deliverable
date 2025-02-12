@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ const speciesSchema = z.object({
     .string()
     .nullable()
     .transform((val) => (val?.trim() === "" ? null : val?.trim())),
+  endangered: z.boolean().default(false),
 });
 
 type FormData = z.infer<typeof speciesSchema>;
@@ -57,9 +59,24 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
       kingdom: species.kingdom,
       total_population: species.total_population,
       description: species.description,
+      endangered: species.endangered ?? false,
     },
     mode: "onChange",
   });
+
+  <FormField
+    control={form.control}
+    name="endangered"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Endangered</FormLabel>
+        <FormControl>
+          <input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />;
 
   /* Connects to Supabase. Updates the species record */
   const onSubmit = async (input: FormData) => {
@@ -72,6 +89,7 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
         kingdom: kingdoms.parse(input.kingdom),
         total_population: input.total_population,
         description: input.description,
+        endangered: input.endangered,
       })
       .eq("id", species.id);
 

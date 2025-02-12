@@ -54,6 +54,7 @@ const speciesSchema = z.object({
     .nullable()
     // Transform empty string or only whitespace input to null before form submission, and trim whitespace otherwise
     .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
+  endangered: z.boolean(),
 });
 
 type FormData = z.infer<typeof speciesSchema>;
@@ -99,6 +100,7 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
         scientific_name: input.scientific_name,
         total_population: input.total_population,
         image: input.image,
+        endangered: input.endangered,
       },
     ]);
 
@@ -246,6 +248,19 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
                     </FormItem>
                   );
                 }}
+              />
+              <FormField
+                control={form.control}
+                name="endangered"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Endangered</FormLabel>
+                    <FormControl>
+                      <input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
               <FormField
                 control={form.control}

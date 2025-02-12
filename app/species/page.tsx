@@ -1,11 +1,8 @@
-import { Separator } from "@/components/ui/separator";
-import { TypographyH2 } from "@/components/ui/typography";
 import { createServerSupabaseClient } from "@/lib/server-utils";
 import { redirect } from "next/navigation";
-import AddSpeciesDialog from "./add-species-dialog";
-import SpeciesCard from "./species-card";
+import SpeciesList from "./species-list";
 
-export default async function SpeciesList() {
+export default async function SpeciesPage() {
   // Create supabase server component client and obtain user session from stored cookie
   const supabase = createServerSupabaseClient();
   const {
@@ -20,18 +17,23 @@ export default async function SpeciesList() {
   // Obtain the ID of the currently signed-in user
   const sessionId = session.user.id;
 
-  const { data: species } = await supabase.from("species").select("*").order("id", { ascending: false });
+  const { data: species } = await supabase
+    .from("species")
+    .select(
+      `
+    id,
+    scientific_name,
+    common_name,
+    description,
+    total_population,
+    kingdom,
+    endangered,
+    author,
+    image,
+    profiles(id, display_name, email)
+  `,
+    )
+    .order("id", { ascending: false });
 
-  return (
-    <>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <TypographyH2>Species List</TypographyH2>
-        <AddSpeciesDialog userId={sessionId} />
-      </div>
-      <Separator className="my-4" />
-      <div className="flex flex-wrap justify-center">
-        {species?.map((species) => <SpeciesCard key={species.id} species={species} sessionId={sessionId} />)}
-      </div>
-    </>
-  );
+  return <SpeciesList species={species ?? []} sessionId={sessionId} />;
 }

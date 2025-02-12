@@ -32,36 +32,6 @@ export default async function UsersPage() {
             <h3 className="text-lg font-semibold">{user.display_name || "No Name Provided"}</h3>
             <p className="text-sm text-gray-600">{user.email}</p>
             <p className="mt-2">{user.biography ?? "No biography available."}</p>
-
-            {sessionUser && sessionUser.id === user.id && (
-              <>
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="secondary" className="mt-2 w-full">
-                      Update Biography
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Update Biography</DialogTitle>
-                      <DialogDescription>Edit your biography and save changes.</DialogDescription>
-                    </DialogHeader>
-                    <Textarea
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder="Enter new biography..."
-                      className="h-24 w-full rounded border p-2"
-                    />
-                    <div className="mt-4 flex gap-2">
-                      <Button onClick={updateBiography}>Save</Button>
-                      <DialogClose asChild>
-                        <Button variant="secondary">Cancel</Button>
-                      </DialogClose>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
           </div>
         ))}
       </div>
