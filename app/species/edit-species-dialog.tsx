@@ -23,10 +23,10 @@ import { useState, type BaseSyntheticEvent } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-/* It defines a Species type based on the Supabase database schema. */
+/* Define a Species type */
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-/* Defines a list of valid kingdom values (e.g., Animalia, Plantae, etc.).*/
+/* Define a list of valid kingdom values */
 const kingdoms = z.enum(["Animalia", "Plantae", "Fungi", "Protista", "Archaea", "Bacteria"]);
 
 /* SpeciesSchema ensures form validation */
@@ -42,7 +42,7 @@ const speciesSchema = z.object({
     .string()
     .nullable()
     .transform((val) => (val?.trim() === "" ? null : val?.trim())),
-  endangered: z.boolean().default(false),
+  endangered: z.boolean().default(false), // ✅ Ensure endangered field exists
 });
 
 type FormData = z.infer<typeof speciesSchema>;
@@ -59,24 +59,10 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
       kingdom: species.kingdom,
       total_population: species.total_population,
       description: species.description,
-      endangered: species.endangered ?? false,
+      endangered: species.endangered ?? false, // ✅ Ensure checkbox state is initialized
     },
     mode: "onChange",
   });
-
-  <FormField
-    control={form.control}
-    name="endangered"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>Endangered</FormLabel>
-        <FormControl>
-          <input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    )}
-  />;
 
   /* Connects to Supabase. Updates the species record */
   const onSubmit = async (input: FormData) => {
@@ -89,7 +75,7 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
         kingdom: kingdoms.parse(input.kingdom),
         total_population: input.total_population,
         description: input.description,
-        endangered: input.endangered,
+        endangered: input.endangered, // ✅ Ensure endangered status is updated
       })
       .eq("id", species.id);
 
@@ -118,7 +104,7 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)}>
-            <FormField /*Renders a label and input box. Displays validation errors (FormMessage) if the input is invalid.*/
+            <FormField
               control={form.control}
               name="scientific_name"
               render={({ field }) => (
@@ -152,7 +138,7 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
                   <FormLabel>Kingdom</FormLabel>
                   <FormControl>
                     <select
-                      value={field.value ?? "Animalia"} // Default to a valid kingdom
+                      value={field.value ?? "Animalia"}
                       onChange={(e) => field.onChange(kingdoms.parse(e.target.value))}
                       className="w-full rounded border p-2"
                     >
@@ -188,6 +174,27 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
                 </FormItem>
               )}
             />
+
+            {/* ✅ Checkbox for Endangered Status */}
+            <FormField
+              control={form.control}
+              name="endangered"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Endangered Status</FormLabel>
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="ml-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="description"
